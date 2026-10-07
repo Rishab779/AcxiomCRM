@@ -1,0 +1,456 @@
+@model AcxiomCRM.Services.DashboardViewModel
+@{
+    ViewData["Title"] = "Sales Dashboard";
+}
+
+<!-- Dashboard Header & Date Filter Bar -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h3 class="fw-bold mb-1">CRM Sales Dashboard</h3>
+        <div class="text-muted small">
+            <i class="bi bi-person-badge me-1"></i> Current View Scope: <span class="badge bg-secondary">@Model.RoleBadge</span>
+        </div>
+    </div>
+
+    <!-- Date Filter Form -->
+    <form method="get" asp-action="Index" class="d-flex flex-wrap align-items-center gap-2">
+        <div class="btn-group btn-group-sm" role="group">
+            <a asp-action="Index" asp-route-dateFilter="today" class="btn btn-outline-secondary @(Model.DateFilter == "today" ? "active" : "")">Today</a>
+            <a asp-action="Index" asp-route-dateFilter="week" class="btn btn-outline-secondary @(Model.DateFilter == "week" ? "active" : "")">This Week</a>
+            <a asp-action="Index" asp-route-dateFilter="month" class="btn btn-outline-secondary @(Model.DateFilter == "month" ? "active" : "")">This Month</a>
+            <a href="javascript:void(0)" onclick="document.getElementById('customDates').classList.toggle('d-none')" class="btn btn-outline-secondary @(Model.DateFilter == "custom" ? "active" : "")">Custom</a>
+        </div>
+
+        <div id="customDates" class="@(Model.DateFilter == "custom" ? "d-flex" : "d-none") gap-2 align-items-center">
+            <input type="hidden" name="dateFilter" value="custom" />
+            <input type="date" name="startDate" value="@(Model.CustomStartDate?.ToString("yyyy-MM-dd"))" class="form-control form-control-sm" />
+            <span class="text-muted small">to</span>
+            <input type="date" name="endDate" value="@(Model.CustomEndDate?.ToString("yyyy-MM-dd"))" class="form-control form-control-sm" />
+            <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+        </div>
+
+        <!-- Quick actions dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-plus-circle me-1"></i> Quick Action
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li><a class="dropdown-item" asp-controller="Lead" asp-action="Create"><i class="bi bi-funnel me-2"></i>New Lead</a></li>
+                <li><a class="dropdown-item" asp-controller="Customer" asp-action="Create"><i class="bi bi-person-plus me-2"></i>New Customer</a></li>
+                <li><a class="dropdown-item" asp-controller="Opportunity" asp-action="Create"><i class="bi bi-graph-up me-2"></i>New Opportunity</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" asp-controller="FollowUp" asp-action="Create"><i class="bi bi-calendar-plus me-2"></i>Schedule Follow-Up</a></li>
+                <li><a class="dropdown-item" asp-controller="Activity" asp-action="Create"><i class="bi bi-clock-history me-2"></i>Log Activity</a></li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<!-- 8 Mandatory KPI Cards -->
+<div class="row g-3 mb-4">
+    <!-- Total Customers -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Total Customers</div>
+                    <div class="kpi-value text-primary">@Model.TotalCustomers</div>
+                </div>
+                <div class="bg-primary bg-opacity-10 text-primary rounded p-2 fs-4">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+            <a asp-controller="Customer" asp-action="Index" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Total Leads -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Total Leads</div>
+                    <div class="kpi-value text-info">@Model.TotalLeads</div>
+                </div>
+                <div class="bg-info bg-opacity-10 text-info rounded p-2 fs-4">
+                    <i class="bi bi-funnel-fill"></i>
+                </div>
+            </div>
+            <a asp-controller="Lead" asp-action="Index" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Open Leads -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Open Leads</div>
+                    <div class="kpi-value text-warning">@Model.OpenLeads</div>
+                </div>
+                <div class="bg-warning bg-opacity-10 text-warning rounded p-2 fs-4">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+            <a asp-controller="Lead" asp-action="Index" asp-route-statusFilter="New" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Total Opportunities -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-secondary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Total Deals</div>
+                    <div class="kpi-value">@Model.TotalOpportunities</div>
+                </div>
+                <div class="bg-secondary bg-opacity-10 text-secondary rounded p-2 fs-4">
+                    <i class="bi bi-briefcase-fill"></i>
+                </div>
+            </div>
+            <a asp-controller="Opportunity" asp-action="Index" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Open Opportunities -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Open Deals</div>
+                    <div class="kpi-value text-primary">@Model.OpenOpportunities</div>
+                </div>
+                <div class="bg-primary bg-opacity-10 text-primary rounded p-2 fs-4">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+            </div>
+            <a asp-controller="Opportunity" asp-action="Index" asp-route-statusFilter="Open" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Won Opportunities -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Won Deals</div>
+                    <div class="kpi-value text-success">@Model.WonOpportunities</div>
+                </div>
+                <div class="bg-success bg-opacity-10 text-success rounded p-2 fs-4">
+                    <i class="bi bi-trophy-fill"></i>
+                </div>
+            </div>
+            <a asp-controller="Opportunity" asp-action="Index" asp-route-statusFilter="Won" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Lost Opportunities -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-danger">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Lost Deals</div>
+                    <div class="kpi-value text-danger">@Model.LostOpportunities</div>
+                </div>
+                <div class="bg-danger bg-opacity-10 text-danger rounded p-2 fs-4">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+            </div>
+            <a asp-controller="Opportunity" asp-action="Index" asp-route-statusFilter="Lost" class="stretched-link"></a>
+        </div>
+    </div>
+
+    <!-- Total Pipeline Value -->
+    <div class="col-sm-6 col-md-3">
+        <div class="card card-kpi h-100 p-3 border-start border-4 border-dark">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="kpi-title">Pipeline Value</div>
+                    <div class="kpi-value text-dark">$@Model.TotalPipelineValue.ToString("N0")</div>
+                    <div class="small text-muted">Weighted: $@Model.WeightedPipelineValue.ToString("N0")</div>
+                </div>
+                <div class="bg-dark bg-opacity-10 text-dark rounded p-2 fs-4">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+            </div>
+            <a asp-controller="Opportunity" asp-action="Index" class="stretched-link"></a>
+        </div>
+    </div>
+</div>
+
+<!-- 3 Mandatory Chart.js Visualizations -->
+<div class="row g-4 mb-4">
+    <!-- Chart 1: Lead Status Breakdown -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Lead Status Funnel</span>
+                <span class="badge bg-light text-dark border">@Model.TotalLeads Total</span>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div style="height: 250px;">
+                    <canvas id="leadStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 2: Opportunity Pipeline by Stage -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-bar-chart-fill me-2 text-success"></i>Opportunity Pipeline</span>
+                <span class="badge bg-light text-dark border">$@Model.TotalPipelineValue.ToString("N0")</span>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div style="height: 250px;">
+                    <canvas id="pipelineStageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 3: Monthly Sales & Pipeline Outcomes -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-graph-up me-2 text-info"></i>Sales Trend (Last 6 Months)</span>
+                <span class="badge bg-light text-dark border">Won vs Open</span>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div style="height: 250px;">
+                    <canvas id="monthlySalesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feeds: Upcoming Follow-ups & Recent Activities -->
+<div class="row g-4">
+    <!-- Follow-Ups Feed -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-calendar-event me-2 text-primary"></i>Upcoming & Overdue Follow-Ups</span>
+                <a asp-controller="FollowUp" asp-action="Index" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.OverdueFollowUps.Any())
+                {
+                    <div class="p-2 bg-danger bg-opacity-10 border-bottom border-danger text-danger small fw-semibold">
+                        <i class="bi bi-exclamation-circle-fill me-1"></i> Attention: @Model.OverdueFollowUps.Count overdue follow-up(s) requiring action
+                    </div>
+                }
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Target / Context</th>
+                                <th>Type</th>
+                                <th>Scheduled</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var f in Model.OverdueFollowUps.Concat(Model.UpcomingFollowUps).Take(6))
+                            {
+                                var isOverdue = f.FollowUpDate < DateTime.UtcNow && f.Status == "Planned";
+                                <tr class="@(isOverdue ? "table-danger" : "")">
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @(f.Customer?.CustomerName ?? f.Lead?.LeadName ?? "Sales Contact")
+                                        </div>
+                                        <div class="small text-muted text-truncate" style="max-width: 180px;">@f.Remarks</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">@f.FollowUpType</span>
+                                    </td>
+                                    <td>
+                                        <div class="small @(isOverdue ? "text-danger fw-bold" : "text-dark")">
+                                            @f.FollowUpDate.ToLocalTime().ToString("MMM dd, yyyy HH:mm")
+                                        </div>
+                                        @if (isOverdue)
+                                        {
+                                            <span class="badge bg-danger">Overdue</span>
+                                        }
+                                        else if (f.FollowUpDate.Date == DateTime.UtcNow.Date)
+                                        {
+                                            <span class="badge bg-warning text-dark">Today</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">@f.Status</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="FollowUp" asp-action="Details" asp-route-id="@f.FollowUpId" class="btn btn-outline-secondary btn-sm">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                            @if (!Model.OverdueFollowUps.Any() && !Model.UpcomingFollowUps.Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <i class="bi bi-check2-circle fs-3 d-block mb-1 text-success"></i>
+                                        No pending follow-ups scheduled.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities Feed -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i>Recent CRM Activities</span>
+                <a asp-controller="Activity" asp-action="Index" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @foreach (var act in Model.RecentActivities)
+                    {
+                        <li class="list-group-item p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="badge @(act.ActivityType == "Call" ? "bg-primary" : act.ActivityType == "Meeting" ? "bg-success" : act.ActivityType == "Email" ? "bg-info text-dark" : "bg-secondary") me-2">
+                                        @act.ActivityType
+                                    </span>
+                                    <span class="fw-semibold text-dark">@act.Subject</span>
+                                    <div class="small text-muted mt-1">
+                                        Linked to: <strong>@(act.Customer?.CustomerName ?? act.Lead?.LeadName ?? "General")</strong>
+                                        @if (!string.IsNullOrEmpty(act.Description))
+                                        {
+                                            <span> &bull; @act.Description</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="text-end text-muted small text-nowrap ms-2">
+                                    @act.ActivityDate.ToLocalTime().ToString("MMM dd, HH:mm")
+                                </div>
+                            </div>
+                        </li>
+                    }
+                    @if (!Model.RecentActivities.Any())
+                    {
+                        <li class="list-group-item text-center py-4 text-muted">
+                            <i class="bi bi-activity fs-3 d-block mb-1"></i>
+                            No recent activities logged.
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Chart 1: Lead Status Chart
+        const leadCtx = document.getElementById('leadStatusChart').getContext('2d');
+        const leadLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeadStatusCounts.Keys));
+        const leadData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeadStatusCounts.Values));
+
+        new Chart(leadCtx, {
+            type: 'doughnut',
+            data: {
+                labels: leadLabels,
+                datasets: [{
+                    data: leadData,
+                    backgroundColor: ['#3b82f6', '#06b6d4', '#10b981', '#6366f1', '#ef4444'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Chart 2: Pipeline Stage Chart
+        const pipeCtx = document.getElementById('pipelineStageChart').getContext('2d');
+        const pipeLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PipelineStageValues.Keys));
+        const pipeData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PipelineStageValues.Values));
+
+        new Chart(pipeCtx, {
+            type: 'bar',
+            data: {
+                labels: pipeLabels,
+                datasets: [{
+                    label: 'Stage Value ($)',
+                    data: pipeData,
+                    backgroundColor: ['#60a5fa', '#38bdf8', '#fbbf24', '#34d399', '#f87171'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '$' + value.toLocaleString()
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 3: Monthly Sales Chart
+        const salesCtx = document.getElementById('monthlySalesChart').getContext('2d');
+        const monthlyLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyLabels));
+        const wonData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyWonValues));
+        const pipeMonthlyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyPipelineValues));
+
+        new Chart(salesCtx, {
+            type: 'bar',
+            data: {
+                labels: monthlyLabels,
+                datasets: [
+                    {
+                        label: 'Won Deals ($)',
+                        data: wonData,
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Open Deals ($)',
+                        data: pipeMonthlyData,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '$' + value.toLocaleString()
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

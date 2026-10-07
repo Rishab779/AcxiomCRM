@@ -1,0 +1,202 @@
+@{
+    ViewData["Title"] = "CRM Reports";
+    bool isAdmin = ViewBag.IsAdmin ?? false;
+    bool isManager = ViewBag.IsManager ?? false;
+}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">CRM Analytics & Reports</h3>
+    <p class="text-muted small mb-0">Role-scoped reports with server-side security, filters, and pagination</p>
+</div>
+
+<div class="row g-4">
+    <!-- Customer Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary bg-opacity-10 text-primary p-3 rounded me-3">
+                        <i class="bi bi-people fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Customer Report</h5>
+                        <small class="text-muted">Accounts directory & status</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">
+                    View customer directory, account status, contact information, and assigned representatives.
+                </p>
+                <a asp-action="CustomerReport" class="btn btn-outline-primary btn-sm w-100">
+                    Open Report <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lead Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-info bg-opacity-10 text-info p-3 rounded me-3">
+                        <i class="bi bi-funnel fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Lead Report</h5>
+                        <small class="text-muted">Prospect sources & qualification</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">
+                    Analyze inbound lead sources, status qualification stages, and conversion eligibility.
+                </p>
+                <a asp-action="LeadReport" class="btn btn-outline-info btn-sm w-100">
+                    Open Report <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opportunity Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-success bg-opacity-10 text-success p-3 rounded me-3">
+                        <i class="bi bi-graph-up fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Opportunity Report</h5>
+                        <small class="text-muted">Deal values & close dates</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">
+                    Track individual pipeline deals, win probabilities, forecast values, and target close dates.
+                </p>
+                <a asp-action="OpportunityReport" class="btn btn-outline-success btn-sm w-100">
+                    Open Report <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline Summary Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning bg-opacity-10 text-warning-emphasis p-3 rounded me-3">
+                        <i class="bi bi-pie-chart fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Pipeline Report</h5>
+                        <small class="text-muted">Stage & owner weighted pipeline</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">
+                    Stage-wise distribution, owner performance breakdowns, and total weighted pipeline forecast calculations.
+                </p>
+                <a asp-action="PipelineReport" class="btn btn-outline-warning text-dark btn-sm w-100">
+                    Open Report <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversion Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-secondary bg-opacity-10 text-secondary p-3 rounded me-3">
+                        <i class="bi bi-arrow-repeat fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Conversion Report</h5>
+                        <small class="text-muted">Lead conversion efficiency</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">
+                    Conversion rates from prospect to customer, generated deal revenues, and win/loss analytics.
+                </p>
+                <a asp-action="ConversionReport" class="btn btn-outline-secondary btn-sm w-100">
+                    Open Report <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Follow-Up Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-danger bg-opacity-10 text-danger p-3 rounded me-3">
+                        <i class="bi bi-calendar-check fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Follow-Up Report</h5>
+                        <small class="text-muted">Task adherence & overdue items</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">
+                    Audit follow-up punctuality, overdue calls/meetings, completed outcome notes, and staff responsiveness.
+                </p>
+                <a asp-action="FollowUpReport" class="btn btn-outline-danger btn-sm w-100">
+                    Open Report <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity Report (Manager & Admin) -->
+    @if (isAdmin || isManager)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white p-3 rounded me-3">
+                            <i class="bi bi-person-lines-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Staff Activity Report</h5>
+                            <small class="badge bg-primary">Management</small>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-3">
+                        Comparative sales team performance: calls, meetings, emails logged, and follow-ups completed by user.
+                    </p>
+                    <a asp-action="UserActivityReport" class="btn btn-primary btn-sm w-100">
+                        Open Report <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Audit Report (Admin only) -->
+    @if (isAdmin)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-dark">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-dark text-white p-3 rounded me-3">
+                            <i class="bi bi-shield-lock fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">System Audit Report</h5>
+                            <small class="badge bg-danger">Admin Only</small>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-3">
+                        Comprehensive audit trail of security logons, failed attempts, lockouts, user changes, and CRM transactions.
+                    </p>
+                    <a asp-action="AuditReport" class="btn btn-dark btn-sm w-100">
+                        Open Report <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

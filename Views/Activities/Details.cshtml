@@ -1,0 +1,93 @@
+@model AcxiomCRM.Models.Activity
+@{
+    ViewData["Title"] = "Activity Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge @(Model.ActivityType == "Call" ? "bg-primary" : Model.ActivityType == "Meeting" ? "bg-success" : Model.ActivityType == "Email" ? "bg-info text-dark" : "bg-secondary")">
+                        @Model.ActivityType
+                    </span>
+                    <h5 class="mb-0 fw-bold">@Model.Subject</h5>
+                </div>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.ActivityId" class="btn btn-outline-secondary btn-sm me-1">Edit</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Activity Date:</div>
+                    <div class="col-sm-8 fw-semibold">@Model.ActivityDate.ToLocalTime().ToString("dddd, MMMM dd, yyyy HH:mm")</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Status:</div>
+                    <div class="col-sm-8">
+                        <span class="badge @(Model.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">@Model.Status</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Associated Record:</div>
+                    <div class="col-sm-8">
+                        @if (Model.Customer != null)
+                        {
+                            <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId">
+                                <i class="bi bi-people me-1"></i> Customer: @Model.Customer.CustomerName
+                            </a>
+                        }
+                        else if (Model.Lead != null)
+                        {
+                            <a asp-controller="Lead" asp-action="Details" asp-route-id="@Model.LeadId">
+                                <i class="bi bi-funnel me-1"></i> Lead: @Model.Lead.LeadName
+                            </a>
+                        }
+                        else if (Model.Opportunity != null)
+                        {
+                            <a asp-controller="Opportunity" asp-action="Details" asp-route-id="@Model.OpportunityId">
+                                <i class="bi bi-graph-up me-1"></i> Deal: @Model.Opportunity.OpportunityName
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">General Activity</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Assigned Representative:</div>
+                    <div class="col-sm-8 fw-semibold">@(Model.AssignedUser?.FullName ?? "Unassigned")</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Logged By:</div>
+                    <div class="col-sm-8 text-muted">@Model.CreatedBy on @Model.CreatedDate.ToLocalTime().ToString("MMM dd, yyyy")</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4 text-muted">Description & Notes:</div>
+                    <div class="col-sm-8">
+                        <div class="bg-light p-3 rounded">
+                            @(string.IsNullOrEmpty(Model.Description) ? "No notes recorded." : Model.Description)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-light text-end">
+                <form asp-action="Delete" asp-route-id="@Model.ActivityId" method="post" class="d-inline" onsubmit="return confirm('Delete this activity record?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash me-1"></i> Delete Activity
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

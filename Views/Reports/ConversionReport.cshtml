@@ -1,0 +1,115 @@
+@model AcxiomCRM.Services.ConversionReportViewModel
+@{
+    ViewData["Title"] = "Conversion Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Lead Conversion Efficiency Report</h3>
+        <p class="text-muted small mb-0">Analysis of qualification success, conversion rates, and revenue generated from leads</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Reports
+    </a>
+</div>
+
+<!-- Date Filter -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body p-3">
+        <form method="get" asp-action="ConversionReport" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">From Date</label>
+                <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">To Date</label>
+                <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-filter me-1"></i> Filter
+                </button>
+                <a asp-action="ConversionReport" class="btn btn-outline-secondary btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Conversion Metrics Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-md-3">
+        <div class="card p-3 border-start border-4 border-primary shadow-sm">
+            <div class="small text-muted text-uppercase fw-bold">Total Inbound Leads</div>
+            <div class="fs-2 fw-bold text-dark">@Model.TotalLeads</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="card p-3 border-start border-4 border-success shadow-sm">
+            <div class="small text-muted text-uppercase fw-bold">Converted to Customer</div>
+            <div class="fs-2 fw-bold text-success">@Model.ConvertedLeads</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="card p-3 border-start border-4 border-info shadow-sm">
+            <div class="small text-muted text-uppercase fw-bold">Conversion Rate</div>
+            <div class="fs-2 fw-bold text-info">@Model.ConversionRate.ToString("F1")%</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="card p-3 border-start border-4 border-dark shadow-sm">
+            <div class="small text-muted text-uppercase fw-bold">Converted Deals Value</div>
+            <div class="fs-2 fw-bold text-dark">$@Model.TotalConvertedOpportunityValue.ToString("N0")</div>
+        </div>
+    </div>
+</div>
+
+<!-- Lead Detail Breakdown -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h6 class="mb-0 fw-bold">Lead Details & Conversion Linkages</h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Lead Name</th>
+                    <th>Company</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Expected Value</th>
+                    <th>Converted Customer Account</th>
+                    <th>Converted Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var l in Model.LeadDetails)
+                {
+                    <tr>
+                        <td class="fw-semibold">@l.LeadName</td>
+                        <td>@(l.CompanyName ?? "-")</td>
+                        <td>@l.Source</td>
+                        <td>
+                            <span class="badge @(l.Status == "Converted" ? "bg-success" : l.Status == "Qualified" ? "bg-primary" : l.Status == "Lost" ? "bg-danger" : "bg-warning text-dark")">
+                                @l.Status
+                            </span>
+                        </td>
+                        <td>$@l.ExpectedValue.ToString("N0")</td>
+                        <td>
+                            @if (l.ConvertedCustomer != null)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success">
+                                    <i class="bi bi-check-circle me-1"></i> @l.ConvertedCustomer.CustomerName
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Not converted</span>
+                            }
+                        </td>
+                        <td>@(l.ConvertedDate.HasValue ? l.ConvertedDate.Value.ToLocalTime().ToString("yyyy-MM-dd") : "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

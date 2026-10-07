@@ -1,0 +1,137 @@
+@model AcxiomCRM.Services.PaginatedList<AcxiomCRM.Models.Lead>
+@{
+    ViewData["Title"] = "Lead Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Lead Acquisition Report</h3>
+        <p class="text-muted small mb-0">Analysis of prospect channels, stage qualification, and conversion linkages</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Reports
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body p-3">
+        <form method="get" asp-action="LeadReport" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small">Status</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Statuses</option>
+                    <option value="New" selected="@(ViewBag.Status == "New")">New</option>
+                    <option value="Contacted" selected="@(ViewBag.Status == "Contacted")">Contacted</option>
+                    <option value="Qualified" selected="@(ViewBag.Status == "Qualified")">Qualified</option>
+                    <option value="Converted" selected="@(ViewBag.Status == "Converted")">Converted</option>
+                    <option value="Lost" selected="@(ViewBag.Status == "Lost")">Lost</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Source</label>
+                <select name="source" class="form-select form-select-sm">
+                    <option value="">All Sources</option>
+                    <option value="Website" selected="@(ViewBag.Source == "Website")">Website</option>
+                    <option value="Referral" selected="@(ViewBag.Source == "Referral")">Referral</option>
+                    <option value="Campaign" selected="@(ViewBag.Source == "Campaign")">Campaign</option>
+                    <option value="Trade Show" selected="@(ViewBag.Source == "Trade Show")">Trade Show</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Captured From</label>
+                <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Captured To</label>
+                <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-filter me-1"></i> Filter
+                </button>
+                <a asp-action="LeadReport" class="btn btn-outline-secondary btn-sm" title="Reset">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Lead Code</th>
+                    <th>Lead Name</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Expected Value</th>
+                    <th>Source</th>
+                    <th>Converted Customer</th>
+                    <th>Owner</th>
+                    <th>Captured Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var l in Model.Items)
+                {
+                    <tr>
+                        <td><code>@l.LeadCode</code></td>
+                        <td>
+                            <a asp-controller="Lead" asp-action="Details" asp-route-id="@l.LeadId" class="fw-semibold text-decoration-none">
+                                @l.LeadName
+                            </a>
+                        </td>
+                        <td>@(l.CompanyName ?? "-")</td>
+                        <td>
+                            <span class="badge @(l.Status == "Converted" ? "bg-success" : l.Status == "Qualified" ? "bg-primary" : l.Status == "Lost" ? "bg-danger" : "bg-warning text-dark")">
+                                @l.Status
+                            </span>
+                        </td>
+                        <td class="fw-bold">$@l.ExpectedValue.ToString("N0")</td>
+                        <td>@l.Source</td>
+                        <td>
+                            @if (l.ConvertedCustomer != null)
+                            {
+                                <a asp-controller="Customer" asp-action="Details" asp-route-id="@l.ConvertedCustomerId" class="text-success small fw-semibold text-decoration-none">
+                                    <i class="bi bi-check-circle me-1"></i>@l.ConvertedCustomer.CustomerName
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">-</span>
+                            }
+                        </td>
+                        <td>@(l.AssignedUser?.FullName ?? "Unassigned")</td>
+                        <td>@l.CreatedDate.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="9" class="text-center py-4 text-muted">No records match query.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+            <span class="small text-muted">Page @Model.PageIndex of @Model.TotalPages (@Model.TotalCount total records)</span>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="LeadReport" asp-route-page="@(Model.PageIndex - 1)" asp-route-status="@ViewBag.Status" asp-route-source="@ViewBag.Source" asp-route-startDate="@ViewBag.StartDate" asp-route-endDate="@ViewBag.EndDate">Previous</a>
+                </li>
+                @for (int p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.PageIndex ? "active" : "")">
+                        <a class="page-link" asp-action="LeadReport" asp-route-page="@p" asp-route-status="@ViewBag.Status" asp-route-source="@ViewBag.Source" asp-route-startDate="@ViewBag.StartDate" asp-route-endDate="@ViewBag.EndDate">@p</a>
+                    </li>
+                }
+                <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="LeadReport" asp-route-page="@(Model.PageIndex + 1)" asp-route-status="@ViewBag.Status" asp-route-source="@ViewBag.Source" asp-route-startDate="@ViewBag.StartDate" asp-route-endDate="@ViewBag.EndDate">Next</a>
+                </li>
+            </ul>
+        </div>
+    }
+</div>

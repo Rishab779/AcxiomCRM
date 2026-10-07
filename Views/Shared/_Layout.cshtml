@@ -1,0 +1,223 @@
+@using Microsoft.AspNetCore.Identity
+@using AcxiomCRM.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AcxiomCRM</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var currentUser = await UserManager.GetUserAsync(User);
+        var userRole = User.IsInRole("Admin") ? "Admin" : User.IsInRole("Manager") ? "Manager" : "Sales Executive";
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+        <div class="app-wrapper">
+            <!-- Sidebar -->
+            <aside class="app-sidebar">
+                <a asp-controller="Dashboard" asp-action="Index" class="sidebar-brand">
+                    <i class="bi bi-briefcase-fill text-primary"></i>
+                    <span>AcxiomCRM</span>
+                </a>
+
+                <ul class="sidebar-menu">
+                    <li class="sidebar-heading">Sales Workspace</li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Dashboard" ? "active" : "")" asp-controller="Dashboard" asp-action="Index">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Customer" ? "active" : "")" asp-controller="Customer" asp-action="Index">
+                            <i class="bi bi-people"></i> Customers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Lead" ? "active" : "")" asp-controller="Lead" asp-action="Index">
+                            <i class="bi bi-funnel"></i> Leads
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Opportunity" ? "active" : "")" asp-controller="Opportunity" asp-action="Index">
+                            <i class="bi bi-graph-up-arrow"></i> Opportunities
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "FollowUp" ? "active" : "")" asp-controller="FollowUp" asp-action="Index">
+                            <i class="bi bi-calendar-check"></i> Follow-Ups
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Activity" ? "active" : "")" asp-controller="Activity" asp-action="Index">
+                            <i class="bi bi-clock-history"></i> Activities
+                        </a>
+                    </li>
+
+                    <li class="sidebar-heading mt-3">Insights</li>
+                    <li class="nav-item">
+                        <a class="nav-link @(currentController == "Report" ? "active" : "")" asp-controller="Report" asp-action="Index">
+                            <i class="bi bi-bar-chart-line"></i> Reports
+                        </a>
+                    </li>
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                    {
+                        <li class="sidebar-heading mt-3">Governance</li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "User" ? "active" : "")" asp-controller="User" asp-action="Index">
+                                    <i class="bi bi-person-gear"></i> User Management
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Audit" ? "active" : "")" asp-controller="Audit" asp-action="Index">
+                                <i class="bi bi-shield-check"></i> Audit Logs
+                            </a>
+                        </li>
+                    }
+
+                    <li class="sidebar-heading mt-3">Developers</li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/swagger" target="_blank">
+                            <i class="bi bi-code-slash"></i> REST API (Swagger)
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Main Content Container -->
+            <div class="app-content">
+                <!-- Topbar -->
+                <header class="app-topbar">
+                    <div class="d-flex align-items-center">
+                        <span class="fw-semibold text-secondary">
+                            <i class="bi bi-building me-1"></i> Sales Organization Portal
+                        </span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-end d-none d-sm-block">
+                            <div class="fw-bold text-dark small">@(currentUser?.FullName ?? User.Identity?.Name)</div>
+                            <span class="badge @(userRole == "Admin" ? "bg-danger" : userRole == "Manager" ? "bg-primary" : "bg-success")">
+                                @userRole
+                            </span>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <h6 class="dropdown-header">@User.Identity?.Name</h6>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
+                                        <i class="bi bi-key me-2"></i> Change Password
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Page Content Body -->
+                <main role="main" class="main-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @RenderBody()
+                </main>
+
+                <!-- Footer -->
+                <footer class="app-footer text-muted d-flex justify-content-between align-items-center">
+                    <div>&copy; 2026 <strong>AcxiomCRM</strong>. All rights reserved.</div>
+                    <div class="small">ASP.NET Core MVC &bull; Entity Framework Core &bull; Identity Security</div>
+                </footer>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="min-vh-100 d-flex flex-column justify-content-between bg-light">
+            <header class="p-3 bg-white border-bottom shadow-sm">
+                <div class="container d-flex justify-content-between align-items-center">
+                    <a asp-controller="Account" asp-action="Login" class="text-decoration-none fw-bold text-dark fs-5 d-flex align-items-center gap-2">
+                        <i class="bi bi-briefcase-fill text-primary"></i> AcxiomCRM
+                    </a>
+                    <div>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm me-2">Login</a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-sm">Register</a>
+                    </div>
+                </div>
+            </header>
+
+            <main role="main" class="flex-grow-1 d-flex align-items-center py-5">
+                <div class="container">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    @TempData["ErrorMessage"]
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @RenderBody()
+                </div>
+            </main>
+
+            <footer class="p-3 bg-white border-top text-center text-muted small">
+                &copy; 2026 AcxiomCRM &bull; Robust Sales CRM Architecture
+            </footer>
+        </div>
+    }
+
+    <!-- jQuery & Bootstrap Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

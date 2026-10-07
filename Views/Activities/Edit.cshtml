@@ -1,0 +1,84 @@
+@model AcxiomCRM.ViewModels.ActivityEditViewModel
+@{
+    ViewData["Title"] = "Edit Activity";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit Activity</h5>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ActivityId" />
+                    <input type="hidden" asp-for="CustomerId" />
+                    <input type="hidden" asp-for="LeadId" />
+                    <input type="hidden" asp-for="OpportunityId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="ActivityType" class="form-label">Activity Type <span class="required-indicator">*</span></label>
+                            <select asp-for="ActivityType" class="form-select">
+                                <option value="Call">Call</option>
+                                <option value="Meeting">Meeting</option>
+                                <option value="Email">Email</option>
+                                <option value="Task">Task</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ActivityDate" class="form-label">Activity Date & Time <span class="required-indicator">*</span></label>
+                            <input asp-for="ActivityDate" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ActivityDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Subject" class="form-label">Subject / Title <span class="required-indicator">*</span></label>
+                        <input asp-for="Subject" class="form-control" />
+                        <span asp-validation-for="Subject" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label">Status</label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Completed">Completed</option>
+                                <option value="Planned">Planned</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <div class="col-md-6">
+                                <label asp-for="AssignedTo" class="form-label">Assigned Representative</label>
+                                <select asp-for="AssignedTo" asp-items="Model.UsersList" class="form-select">
+                                    <option value="">-- Assign Owner --</option>
+                                </select>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" asp-for="AssignedTo" />
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label">Activity Summary & Details</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Update Activity
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

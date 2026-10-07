@@ -1,0 +1,91 @@
+@model AcxiomCRM.ViewModels.OpportunityEditViewModel
+@{
+    ViewData["Title"] = "Edit Opportunity";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit Deal: @Model.OpportunityName</h5>
+                <a asp-action="Details" asp-route-id="@Model.OpportunityId" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="OpportunityId" />
+                    <input type="hidden" asp-for="LeadId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="OpportunityName" class="form-label">Opportunity Name <span class="required-indicator">*</span></label>
+                        <input asp-for="OpportunityName" class="form-control" />
+                        <span asp-validation-for="OpportunityName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="CustomerId" class="form-label">Customer Account <span class="required-indicator">*</span></label>
+                            <select asp-for="CustomerId" asp-items="Model.CustomersList" class="form-select"></select>
+                            <span asp-validation-for="CustomerId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Amount" class="form-label">Deal Amount ($) <span class="required-indicator">*</span></label>
+                            <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                            <span asp-validation-for="Amount" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="Stage" class="form-label">Pipeline Stage</label>
+                            <select asp-for="Stage" class="form-select">
+                                <option value="Qualification">Qualification</option>
+                                <option value="Proposal">Proposal</option>
+                                <option value="Negotiation">Negotiation</option>
+                                <option value="Won">Won</option>
+                                <option value="Lost">Lost</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Probability" class="form-label">Win Probability (%)</label>
+                            <input asp-for="Probability" class="form-control" type="number" min="0" max="100" />
+                            <span asp-validation-for="Probability" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ExpectedCloseDate" class="form-label">Expected Close Date <span class="required-indicator">*</span></label>
+                            <input asp-for="ExpectedCloseDate" class="form-control" type="date" />
+                            <span asp-validation-for="ExpectedCloseDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                    {
+                        <div class="mb-3">
+                            <label asp-for="AssignedTo" class="form-label">Assigned Representative</label>
+                            <select asp-for="AssignedTo" asp-items="Model.UsersList" class="form-select">
+                                <option value="">-- Assign Owner --</option>
+                            </select>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" asp-for="AssignedTo" />
+                    }
+
+                    <div class="mb-4">
+                        <label asp-for="Notes" class="form-label">Notes & Status Comments</label>
+                        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Details" asp-route-id="@Model.OpportunityId" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Update Opportunity
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

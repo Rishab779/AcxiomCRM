@@ -1,0 +1,89 @@
+@model AcxiomCRM.ViewModels.FollowUpEditViewModel
+@{
+    ViewData["Title"] = "Schedule Follow-Up";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-calendar-plus me-2 text-primary"></i>Schedule Follow-Up</h5>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <!-- Association: Pick Customer, Lead, or Opportunity -->
+                    <div class="card mb-3 bg-light border-0">
+                        <div class="card-body">
+                            <h6 class="fw-bold small text-uppercase text-secondary mb-3">Associated CRM Record (Pick at least one)</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label asp-for="CustomerId" class="form-label small">Customer Account</label>
+                                    <select asp-for="CustomerId" asp-items="Model.CustomersList" class="form-select form-select-sm">
+                                        <option value="">-- None --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="LeadId" class="form-label small">Lead Prospect</label>
+                                    <select asp-for="LeadId" asp-items="Model.LeadsList" class="form-select form-select-sm">
+                                        <option value="">-- None --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="OpportunityId" class="form-label small">Opportunity Deal</label>
+                                    <select asp-for="OpportunityId" asp-items="Model.OpportunitiesList" class="form-select form-select-sm">
+                                        <option value="">-- None --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FollowUpDate" class="form-label">Scheduled Date & Time <span class="required-indicator">*</span></label>
+                            <input asp-for="FollowUpDate" class="form-control" type="datetime-local" />
+                            <small class="text-muted d-block mt-1">Rule: Date cannot be earlier than today.</small>
+                            <span asp-validation-for="FollowUpDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="FollowUpType" class="form-label">Interaction Type <span class="required-indicator">*</span></label>
+                            <select asp-for="FollowUpType" class="form-select">
+                                <option value="Call">Phone Call</option>
+                                <option value="Meeting">Meeting (In-person / Virtual)</option>
+                                <option value="Email">Email Communication</option>
+                                <option value="Demo">Product Demo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                    {
+                        <div class="mb-3">
+                            <label asp-for="AssignedTo" class="form-label">Assigned Representative</label>
+                            <select asp-for="AssignedTo" asp-items="Model.UsersList" class="form-select">
+                                <option value="">-- Assign Owner --</option>
+                            </select>
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        <label asp-for="Remarks" class="form-label">Agenda / Objectives <span class="required-indicator">*</span></label>
+                        <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Discuss technical requirements, pricing quote review, contract follow-up..."></textarea>
+                        <span asp-validation-for="Remarks" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-calendar-check me-1"></i> Save Follow-Up
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

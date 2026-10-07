@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>An Error Occurred</h5>
+                </div>
+                <div class="card-body py-4 text-center">
+                    <p class="text-muted mb-4">An error occurred while processing your request. Please try again or contact your administrator.</p>
+                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary">
+                        <i class="bi bi-house-door me-1"></i> Return to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

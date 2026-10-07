@@ -1,0 +1,120 @@
+@{
+    ViewData["Title"] = "Pipeline Report";
+    var stages = ViewBag.Stages as List<AcxiomCRM.Services.PipelineStageSummary> ?? new();
+    var owners = ViewBag.Owners as List<AcxiomCRM.Services.PipelineOwnerSummary> ?? new();
+    decimal totalWeighted = ViewBag.TotalWeighted ?? 0m;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Sales Pipeline & Forecast Report</h3>
+        <p class="text-muted small mb-0">Stage distribution, representative deal allocations, and weighted value forecasts</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Reports
+    </a>
+</div>
+
+<!-- Highlight Box: Weighted Pipeline -->
+<div class="card mb-4 bg-primary text-white border-0 shadow-sm">
+    <div class="card-body p-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="text-white-50 text-uppercase mb-1 small fw-bold">Active Weighted Pipeline Forecast</h6>
+            <h2 class="fw-bold mb-0">$@totalWeighted.ToString("N0")</h2>
+            <small class="text-white-50">Calculated as &Sigma; (Active Deal Amount &times; Win Probability %)</small>
+        </div>
+        <div class="display-5 text-white-50">
+            <i class="bi bi-calculator"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Stage-wise Distribution -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-funnel me-2 text-primary"></i>Stage-Wise Pipeline Distribution</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Pipeline Stage</th>
+                            <th class="text-center">Deals</th>
+                            <th class="text-end">Total Contract Value</th>
+                            <th class="text-end">Weighted Forecast</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in stages)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge @(s.Stage == "Won" ? "bg-success" : s.Stage == "Lost" ? "bg-danger" : s.Stage == "Negotiation" ? "bg-warning text-dark" : "bg-primary")">
+                                        @s.Stage
+                                    </span>
+                                </td>
+                                <td class="text-center fw-semibold">@s.Count</td>
+                                <td class="text-end fw-bold">$@s.TotalAmount.ToString("N0")</td>
+                                <td class="text-end text-primary fw-semibold">$@s.WeightedAmount.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td>Total</td>
+                            <td class="text-center">@stages.Sum(s => s.Count)</td>
+                            <td class="text-end">$@stages.Sum(s => s.TotalAmount).ToString("N0")</td>
+                            <td class="text-end text-primary">$@stages.Sum(s => s.WeightedAmount).ToString("N0")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner-wise Distribution -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-person-check me-2 text-success"></i>Owner-Wise Allocation</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sales Representative</th>
+                            <th class="text-center">Deals</th>
+                            <th class="text-end">Total Value</th>
+                            <th class="text-end">Weighted Forecast</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in owners)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@o.OwnerName</td>
+                                <td class="text-center">@o.OpportunityCount</td>
+                                <td class="text-end fw-bold">$@o.TotalAmount.ToString("N0")</td>
+                                <td class="text-end text-success fw-semibold">$@o.WeightedAmount.ToString("N0")</td>
+                            </tr>
+                        }
+                        @if (!owners.Any())
+                        {
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No deals allocated yet.</td></tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td>Total</td>
+                            <td class="text-center">@owners.Sum(o => o.OpportunityCount)</td>
+                            <td class="text-end">$@owners.Sum(o => o.TotalAmount).ToString("N0")</td>
+                            <td class="text-end text-success">$@owners.Sum(o => o.WeightedAmount).ToString("N0")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

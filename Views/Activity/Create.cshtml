@@ -1,0 +1,103 @@
+@model AcxiomCRM.ViewModels.ActivityEditViewModel
+@{
+    ViewData["Title"] = "Log Activity";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i>Log Sales Activity</h5>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <!-- Association: Pick Customer, Lead, or Opportunity -->
+                    <div class="card mb-3 bg-light border-0">
+                        <div class="card-body">
+                            <h6 class="fw-bold small text-uppercase text-secondary mb-3">Link to CRM Record (Optional)</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label asp-for="CustomerId" class="form-label small">Customer Account</label>
+                                    <select asp-for="CustomerId" asp-items="Model.CustomersList" class="form-select form-select-sm">
+                                        <option value="">-- None --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="LeadId" class="form-label small">Lead Prospect</label>
+                                    <select asp-for="LeadId" asp-items="Model.LeadsList" class="form-select form-select-sm">
+                                        <option value="">-- None --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="OpportunityId" class="form-label small">Opportunity Deal</label>
+                                    <select asp-for="OpportunityId" asp-items="Model.OpportunitiesList" class="form-select form-select-sm">
+                                        <option value="">-- None --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="ActivityType" class="form-label">Activity Type <span class="required-indicator">*</span></label>
+                            <select asp-for="ActivityType" class="form-select">
+                                <option value="Call">Call</option>
+                                <option value="Meeting">Meeting</option>
+                                <option value="Email">Email</option>
+                                <option value="Task">Task</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ActivityDate" class="form-label">Activity Date & Time <span class="required-indicator">*</span></label>
+                            <input asp-for="ActivityDate" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ActivityDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Subject" class="form-label">Subject / Title <span class="required-indicator">*</span></label>
+                        <input asp-for="Subject" class="form-control" placeholder="e.g. Discussed SLA terms with VP" />
+                        <span asp-validation-for="Subject" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label">Status</label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Completed">Completed</option>
+                                <option value="Planned">Planned</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <div class="col-md-6">
+                                <label asp-for="AssignedTo" class="form-label">Assigned Representative</label>
+                                <select asp-for="AssignedTo" asp-items="Model.UsersList" class="form-select">
+                                    <option value="">-- Assign Owner --</option>
+                                </select>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label">Activity Summary & Details</label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Detail notes from interaction..."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Save Activity
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
